@@ -7,3 +7,4 @@ polkadot/runtime/wasm/target/
 .vscode
 polkadot.*
 .DS_Store
+.idea/

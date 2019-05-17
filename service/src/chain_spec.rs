@@ -334,3 +334,30 @@ fn local_testnet_genesis() -> GenesisConfig {
 pub fn local_testnet_config() -> ChainSpec {
 	ChainSpec::from_genesis("Local Testnet", "local_testnet", local_testnet_genesis, vec![], None, Some(DEFAULT_PROTOCOL_ID), None, None)
 }
+
+
+pub fn get_ed_public_key_from_seed(seed: &str) -> ed25519::Public {
+	ed25519::Pair::from_string(&format!("//{}", seed), None)
+		.expect("static values are valid; qed")
+		.public()
+}
+
+fn bench_testnet_genesis() -> GenesisConfig {
+	info!("Foo: {}", get_account_id_from_seed("foo"));
+
+	testnet_genesis(
+		vec![
+			get_authority_keys_from_seed("Alice"),
+		],
+		get_account_id_from_seed("Alice").into(),
+		Some(vec![
+			get_authority_keys_from_seed("Alice").0,
+			get_account_id_from_seed("foo"),
+			get_account_id_from_seed("bar"),
+		]),
+	)
+}
+
+pub fn bench_testnet_config() -> ChainSpec {
+	ChainSpec::from_genesis("Bench Testnet", "bench_testnet", bench_testnet_genesis, vec![], None, Some(DEFAULT_PROTOCOL_ID), None, None)
+}

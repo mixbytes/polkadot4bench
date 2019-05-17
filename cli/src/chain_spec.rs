@@ -30,6 +30,7 @@ pub enum ChainSpec {
 	Alexander,
 	/// Whatever the current runtime is with the "global testnet" defaults.
 	StagingTestnet,
+	Bench,
 }
 
 impl Default for ChainSpec {
@@ -46,6 +47,7 @@ impl ChainSpec {
 			ChainSpec::Development => service::chain_spec::development_config(),
 			ChainSpec::LocalTestnet => service::chain_spec::local_testnet_config(),
 			ChainSpec::StagingTestnet => service::chain_spec::staging_testnet_config(),
+			ChainSpec::Bench => service::chain_spec::bench_testnet_config(),
 		})
 	}
 
@@ -55,6 +57,7 @@ impl ChainSpec {
 			"local" => Some(ChainSpec::LocalTestnet),
 			"poc-3" | "alex" | "alexander" => Some(ChainSpec::Alexander),
 			"staging" => Some(ChainSpec::StagingTestnet),
+			"bench" => Some(ChainSpec::Bench),
 			"" => Some(ChainSpec::default()),
 			_ => None,
 		}

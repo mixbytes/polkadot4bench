@@ -16,6 +16,8 @@
 
 //! Polkadot chain configurations.
 
+use std::env;
+
 use primitives::{ed25519, sr25519, Pair, crypto::UncheckedInto};
 use polkadot_primitives::{AccountId, SessionKey};
 use polkadot_runtime::{
@@ -343,18 +345,27 @@ pub fn get_ed_public_key_from_seed(seed: &str) -> ed25519::Public {
 }
 
 fn bench_testnet_genesis() -> GenesisConfig {
-	info!("Foo: {}", get_account_id_from_seed("foo"));
+	let s: String = match env::var_os("EXTRA_VALIDATORS") {
+		Some(val) => val.into_string().unwrap(),
+		None => "0".to_string()
+	};
+	let validators: u32 = s.parse().unwrap();
+
+	let mut initial_authorities: Vec<(AccountId, AccountId, SessionKey)> = vec![get_authority_keys_from_seed("Alice")];
+	let mut endowed_accounts: Vec<AccountId> = vec![get_authority_keys_from_seed("Alice").0];
+
+	for v in 0..validators {
+		initial_authorities.push(get_authority_keys_from_seed(&format!("v{}", v)));
+		endowed_accounts.push(get_authority_keys_from_seed(&format!("v{}", v)).0);
+	}
+
+	endowed_accounts.push(get_account_id_from_seed("foo"));
+	endowed_accounts.push(get_account_id_from_seed("bar"));
 
 	testnet_genesis(
-		vec![
-			get_authority_keys_from_seed("Alice"),
-		],
+		initial_authorities,
 		get_account_id_from_seed("Alice").into(),
-		Some(vec![
-			get_authority_keys_from_seed("Alice").0,
-			get_account_id_from_seed("foo"),
-			get_account_id_from_seed("bar"),
-		]),
+		Some(endowed_accounts),
 	)
 }
 

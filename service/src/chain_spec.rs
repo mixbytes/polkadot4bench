@@ -248,7 +248,7 @@ pub fn testnet_genesis(
 		staking: Some(StakingConfig {
 			current_era: 0,
 			minimum_validator_count: 1,
-			validator_count: 2,
+			validator_count: initial_authorities.len() as u32,
 			sessions_per_era: 5,
 			bonding_duration: 2 * 60 * 12,
 			offline_slash: Perbill::zero(),

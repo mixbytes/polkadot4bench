@@ -32,7 +32,7 @@ RUN mv /usr/share/ca* /tmp && \
 
 RUN	rm -rf /usr/bin /usr/sbin
 
-EXPOSE 30333 9933 9944 8889
+EXPOSE 30333 9933 9944
 VOLUME ["/data"]
 
 CMD ["/usr/local/bin/polkadot"]

@@ -362,6 +362,10 @@ fn bench_testnet_genesis() -> GenesisConfig {
 	endowed_accounts.push(get_account_id_from_seed("foo"));
 	endowed_accounts.push(get_account_id_from_seed("bar"));
 
+	for i in 0..1000 {
+		endowed_accounts.push(get_account_id_from_seed(&format!("user//{:05}", i)));
+	}
+
 	testnet_genesis(
 		initial_authorities,
 		get_account_id_from_seed("Alice").into(),

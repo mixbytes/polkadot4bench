@@ -220,7 +220,7 @@ pub fn testnet_genesis(
 	});
 
 	const STASH: u128 = 1 << 20;
-	const ENDOWMENT: u128 = 1 << 20;
+	const ENDOWMENT: u128 = 1 << 30;
 
 	GenesisConfig {
 		consensus: Some(ConsensusConfig {

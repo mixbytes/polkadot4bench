@@ -7,8 +7,8 @@ WORKDIR /polkadot
 
 COPY . /polkadot
 
-RUN apt-get update && \
-	apt-get upgrade -y && \
+RUN apt-get update && apt-get install -y -o Dpkg::Options::=--force-confnew util-linux
+RUN apt-get upgrade -y && \
 	apt-get install -y cmake pkg-config libssl-dev git clang
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y && \
         export PATH=$PATH:$HOME/.cargo/bin && \

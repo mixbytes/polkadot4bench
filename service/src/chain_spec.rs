@@ -218,9 +218,9 @@ pub fn get_authority_keys_from_seed(seed: &str) -> (
 pub fn testnet_genesis(
     initial_authorities: Vec<(AccountId, AccountId, BabeId, GrandpaId, ImOnlineId, ValidatorId)>,
     root_key: AccountId,
-    endowed_accounts: Option<Vec<AccountId>>,
+    endowed_accounts_arg: Option<Vec<AccountId>>,
 ) -> GenesisConfig {
-    let endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
+    let endowed_accounts: Vec<AccountId> = endowed_accounts_arg.unwrap_or_else(|| {
         vec![
             get_account_id_from_seed::<sr25519::Public>("Alice"),
             get_account_id_from_seed::<sr25519::Public>("Bob"),
@@ -359,31 +359,36 @@ fn bench_testnet_genesis() -> GenesisConfig {
 	};
 	let validators: u32 = s.parse().unwrap();
 
+    let s: String = match env::var_os("EXTRA_ENDOWED") {
+        Some(val) => val.into_string().unwrap(),
+        None => "0".to_string()
+    };
+    let extra_endowed: u32 = s.parse().unwrap();
+
     let mut initial_authorities: Vec<(AccountId, AccountId, BabeId, GrandpaId, ImOnlineId, ValidatorId)> = vec![
         get_authority_keys_from_seed("Alice"),
     ];
     let mut endowed_accounts: Vec<AccountId> = vec![
-		get_authority_keys_from_seed("Alice").0,
-		get_authority_keys_from_seed("Alice//stash").0,
+        get_from_seed::<AccountId>("Alice"),
+        get_from_seed::<AccountId>("Alice//stash"),
 	];
 
     for v in 0..validators {
         initial_authorities.push(get_authority_keys_from_seed(&format!("v{}", v)));
-        endowed_accounts.push(get_authority_keys_from_seed(&format!("v{}", v)).0);
-        endowed_accounts.push(get_authority_keys_from_seed(&format!("v{}//stash", v)).0);
+        endowed_accounts.push(get_from_seed::<AccountId>(&format!("v{}", v)));
+        endowed_accounts.push(get_from_seed::<AccountId>(&format!("v{}//stash", v)));
     }
 
-    endowed_accounts.push(get_account_id_from_seed("foo"));
-    endowed_accounts.push(get_account_id_from_seed("bar"));
-
-    for i in 0..10000 {
-        endowed_accounts.push(get_account_id_from_seed(&format!("user//{:05}", i)));
+    for i in 0..extra_endowed {
+        endowed_accounts.push(get_from_seed::<AccountId>(&format!("user{:05}", i)));
+        endowed_accounts.push(get_from_seed::<AccountId>(&format!("user{:05}//stash", i)));
     }
 
     testnet_genesis(
         initial_authorities,
         get_from_seed::<AccountId>("Alice"),
         Some(endowed_accounts),
+//None
     )
 }
 

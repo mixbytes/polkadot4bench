@@ -430,6 +430,12 @@ fn bench_testnet_genesis() -> polkadot::GenesisConfig {
 	};
 	let validators: u32 = s.parse().unwrap();
 
+	let s: String = match env::var_os("EXTRA_ENDOWED") {
+		Some(val) => val.into_string().unwrap(),
+		None => "0".to_string()
+	};
+	let extra_endowed: u32 = s.parse().unwrap();
+
 	let mut initial_authorities: Vec<(AccountId,
 									  AccountId,
 									  BabeId,
@@ -438,18 +444,21 @@ fn bench_testnet_genesis() -> polkadot::GenesisConfig {
 									  ValidatorId,
 									  AuthorityDiscoveryId
 	)> = vec![get_authority_keys_from_seed("Alice")];
-	let mut endowed_accounts: Vec<AccountId> = vec![get_authority_keys_from_seed("Alice").0];
+
+	let mut endowed_accounts: Vec<AccountId> = vec![
+		get_account_id_from_seed::<sr25519::Public>("Alice"),
+		get_account_id_from_seed::<sr25519::Public>("Alice//stash")
+	];
 
 	for v in 0..validators {
 		initial_authorities.push(get_authority_keys_from_seed(&format!("v{}", v)));
-		endowed_accounts.push(get_authority_keys_from_seed(&format!("v{}", v)).0);
+		endowed_accounts.push(get_account_id_from_seed::<sr25519::Public>(&format!("v{}", v)));
+		endowed_accounts.push(get_account_id_from_seed::<sr25519::Public>(&format!("v{}//stash", v)));
 	}
 
-	endowed_accounts.push(get_account_id_from_seed::<sr25519::Public>("foo"));
-	endowed_accounts.push(get_account_id_from_seed::<sr25519::Public>("bar"));
-
-	for i in 0..10000 {
-		endowed_accounts.push(get_account_id_from_seed::<sr25519::Public>(&format!("user//{:05}", i)));
+	for i in 0..extra_endowed {
+		endowed_accounts.push(get_account_id_from_seed::<sr25519::Public>(&format!("user{:05}", i)));
+		endowed_accounts.push(get_account_id_from_seed::<sr25519::Public>(&format!("user{:05}//stash", i)));
 	}
 
 	testnet_genesis(

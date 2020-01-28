@@ -1,5 +1,5 @@
 FROM phusion/baseimage:0.11 as builder
-LABEL maintainer "chevdor@gmail.com"
+LABEL maintainer "alexey@mixbytes.io"
 LABEL description="This is the build stage for Polkadot. Here we create the binary."
 
 ARG PROFILE=release
@@ -18,7 +18,7 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- -y && \
 # ===== SECOND STAGE ======
 
 FROM phusion/baseimage:0.11
-LABEL maintainer "chevdor@gmail.com"
+LABEL maintainer "alexey@mixbytes.io"
 LABEL description="This is the 2nd stage: a very small image where we copy the Polkadot binary."
 ARG PROFILE=release
 COPY --from=builder /polkadot/target/$PROFILE/polkadot /usr/local/bin

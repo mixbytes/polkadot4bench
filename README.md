@@ -1,3 +1,5 @@
+This version of https://github.com/paritytech/polkadot[Polkadot] is being benchmarked by https://github.com/mixbytes/tank[MixBytes Tank].
+
 ---
 author: Polkadot developers
 revision: 0.3.1

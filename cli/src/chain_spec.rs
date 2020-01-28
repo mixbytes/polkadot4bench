@@ -30,6 +30,7 @@ pub enum ChainSpec {
 	Kusama,
 	/// Whatever the current runtime is with the "global testnet" defaults.
 	StagingTestnet,
+	Bench,
 }
 
 impl Default for ChainSpec {
@@ -46,7 +47,8 @@ impl ChainSpec {
 			ChainSpec::LocalTestnet => Ok(service::chain_spec::local_testnet_config()),
 			ChainSpec::StagingTestnet => Ok(service::chain_spec::staging_testnet_config()),
 			ChainSpec::Kusama => service::chain_spec::kusama_config(),
-		}
+            ChainSpec::Bench => Ok(service::chain_spec::bench_testnet_config()),
+        }
 	}
 
 	pub(crate) fn from(s: &str) -> Option<Self> {
@@ -55,6 +57,7 @@ impl ChainSpec {
 			"local" => Some(ChainSpec::LocalTestnet),
 			"kusama" => Some(ChainSpec::Kusama),
 			"staging" => Some(ChainSpec::StagingTestnet),
+			"bench" => Some(ChainSpec::Bench),
 			"" => Some(ChainSpec::default()),
 			_ => None,
 		}

@@ -582,7 +582,7 @@ pub type BlockId = generic::BlockId<Block>;
 /// The SignedExtension to the basic transaction logic.
 pub type SignedExtra = (
 	// RELEASE: remove this for release build.
-	OnlyStakingAndClaims,
+	//OnlyStakingAndClaims,
 	system::CheckVersion<Runtime>,
 	system::CheckGenesis<Runtime>,
 	system::CheckEra<Runtime>,

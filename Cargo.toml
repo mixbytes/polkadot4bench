@@ -46,6 +46,9 @@ exclude = [
 [badges]
 maintenance = { status = "actively-developed" }
 
+[profile.dev]
+debug = 0
+
 [profile.release]
 # Polkadot runtime requires unwinding.
 panic = "unwind"

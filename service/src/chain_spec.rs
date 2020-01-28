@@ -16,6 +16,8 @@
 
 //! Polkadot chain configurations.
 
+use std::env;
+
 use sp_core::{Pair, Public, crypto::UncheckedInto, sr25519};
 use polkadot_primitives::{AccountId, AccountPublic, parachain::ValidatorId};
 use polkadot_runtime as polkadot;
@@ -224,6 +226,12 @@ fn staging_testnet_config_genesis() -> polkadot::GenesisConfig {
 	}
 }
 
+//pub fn get_account_id_from_seed(seed: &str) -> AccountId {
+//        sr25519::Pair::from_string(&format!("//{}", seed), None)
+//                        .expect("static values are valid; qed")
+//                        .public()
+//}
+
 /// Staging testnet config.
 pub fn staging_testnet_config() -> ChainSpec {
 	let boot_nodes = vec![];
@@ -298,7 +306,7 @@ pub fn testnet_genesis(
 		]
 	});
 
-	const ENDOWMENT: u128 = 1_000_000 * DOTS;
+	const ENDOWMENT: u128 = 1_000_000_000 * DOTS;
 	const STASH: u128 = 100 * DOTS;
 
 	polkadot::GenesisConfig {
@@ -322,7 +330,7 @@ pub fn testnet_genesis(
 		staking: Some(polkadot::StakingConfig {
 			current_era: 0,
 			minimum_validator_count: 1,
-			validator_count: 2,
+			validator_count: initial_authorities.len() as u32,
 			stakers: initial_authorities.iter()
 				.map(|x| (x.0.clone(), x.1.clone(), STASH, polkadot::StakerStatus::Validator))
 				.collect(),
@@ -412,4 +420,46 @@ pub fn local_testnet_config() -> ChainSpec {
 		None,
 		Default::default(),
 	)
+}
+
+
+fn bench_testnet_genesis() -> polkadot::GenesisConfig {
+	let s: String = match env::var_os("EXTRA_VALIDATORS") {
+		Some(val) => val.into_string().unwrap(),
+		None => "0".to_string()
+	};
+	let validators: u32 = s.parse().unwrap();
+
+	let mut initial_authorities: Vec<(AccountId,
+									  AccountId,
+									  BabeId,
+									  GrandpaId,
+									  ImOnlineId,
+									  ValidatorId,
+									  AuthorityDiscoveryId
+	)> = vec![get_authority_keys_from_seed("Alice")];
+	let mut endowed_accounts: Vec<AccountId> = vec![get_authority_keys_from_seed("Alice").0];
+
+	for v in 0..validators {
+		initial_authorities.push(get_authority_keys_from_seed(&format!("v{}", v)));
+		endowed_accounts.push(get_authority_keys_from_seed(&format!("v{}", v)).0);
+	}
+
+	endowed_accounts.push(get_account_id_from_seed::<sr25519::Public>("foo"));
+	endowed_accounts.push(get_account_id_from_seed::<sr25519::Public>("bar"));
+
+	for i in 0..10000 {
+		endowed_accounts.push(get_account_id_from_seed::<sr25519::Public>(&format!("user//{:05}", i)));
+	}
+
+	testnet_genesis(
+		initial_authorities,
+		get_account_id_from_seed::<sr25519::Public>("Alice"),
+		Some(endowed_accounts),
+	)
+}
+
+pub fn bench_testnet_config() -> ChainSpec {
+	ChainSpec::from_genesis("Bench Testnet", "bench_testnet", bench_testnet_genesis, vec![], None, Some(DEFAULT_PROTOCOL_ID), None,
+							Default::default())
 }
